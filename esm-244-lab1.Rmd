@@ -23,7 +23,7 @@ sf_trees <- read_csv(here("data", "sf_trees", "sf_trees.csv"))
 
 ### Basic wrangling reminders
 
-Find the top 5 highest observations of trees by legal_status, do some wrangling, make a graph.
+Find the top 5 highest observations of trees by legal_status, do some wrangling.
 
 ```{r}
 top_5_status <- sf_trees %>% 
@@ -33,5 +33,43 @@ top_5_status <- sf_trees %>%
   relocate(tree_count) %>% 
   slice_max(order_by = tree_count, n = 5)
   
+```
+
+Make a graph of the top 5 trees by legal status.
+```{r}
+ggplot(data = top_5_status, aes(x = fct_reorder(legal_status, tree_count), y = tree_count)) +
+  geom_col() +
+  labs(x = "Legal Status", y = "Tree Count") +
+  coord_flip() +
+  theme_minimal()
+
+```
+
+### A few more data wrangling refresher examples
+
+Only want to keep observations for blackwood acacia trees.
+
+```{r}
+blackwood_acacia <- sf_trees %>% 
+  filter(str_detect(species, "Blackwood Acacia")) %>% 
+  select(legal_status, date, latitude, longitude)
+
+```
+
+Make a fake map (r will not know that lat/long are coordinates, just using x/y)
+```{r}
+ggplot(data = blackwood_acacia, aes(x = longitude, y = latitude)) + 
+  geom_point()
+```
+
+### Tidyr::seperate() and unite() functions
+Useful for combining or separating columns
+
+```{r}
+sf_trees_sep <- sf_trees %>% 
+  separate(species, into = c("spp_scientific", "spp_common"), sep = "::")
+
+sf_trees_unite <- sf_trees %>% 
+  unite("id_status", tree_id:legal_status, sep = "_cool!_")
 ```
 
